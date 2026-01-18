@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: tech-rag-db
+    environment:
+      POSTGRES_DB: techrag
+      POSTGRES_USER: techrag
+      POSTGRES_PASSWORD: techrag123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: tech-rag-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
