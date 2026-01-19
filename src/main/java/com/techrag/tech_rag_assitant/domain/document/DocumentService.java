@@ -1,7 +1,11 @@
 package com.techrag.tech_rag_assitant.domain.document;
 
+import com.techrag.tech_rag_assitant.domain.chunk.Chunk;
+import com.techrag.tech_rag_assitant.domain.chunk.ChunkRepository;
 import com.techrag.tech_rag_assitant.domain.document.dto.DocumentResponse;
 import com.techrag.tech_rag_assitant.domain.document.dto.DocumentSaveRequest;
+import com.techrag.tech_rag_assitant.embedding.ChunkService;
+import com.techrag.tech_rag_assitant.embedding.EmbeddingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,9 +20,13 @@ import java.util.List;
 public class DocumentService {
 
     private final DocumentRepository documentRepository;
+    private final ChunkRepository chunkRepository;
+    private final ChunkService chunkService;
+    private final EmbeddingService embeddingService;
 
     @Transactional
     public DocumentResponse save(DocumentSaveRequest request) {
+        // Document 저장
         Document document = Document.builder()
                 .url(request.getUrl())
                 .title(request.getTitle())
@@ -28,7 +36,25 @@ public class DocumentService {
         Document saved = documentRepository.save(document);
         log.info("Document saved: id={}, title={}", saved.getId(), saved.getTitle());
 
-        // TODO: 임베딩 작업을 Queue에 등록
+        // 텍스트를 청크로 분할
+        List<String> chunks = chunkService.splitIntoChunks(request.getText());
+        log.info("Text split into {} chunks", chunks.size());
+
+        // 각 청크에 대해 임베딩 생성 및 저장
+        for (String chunkText : chunks) {
+            List<Double> embedding = embeddingService.createEmbedding(chunkText);
+            String embeddingStr = embeddingService.embeddingToString(embedding);
+
+            Chunk chunk = Chunk.builder()
+                    .document(saved)
+                    .content(chunkText)
+                    .embedding(embeddingStr)
+                    .build();
+
+            chunkRepository.save(chunk);
+            log.debug("Chunk saved: documentId={}, contentLength={}", 
+                    saved.getId(), chunkText.length());
+        }
 
         return new DocumentResponse(saved);
     }
