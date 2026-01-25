@@ -17,8 +17,8 @@ spring:
 openai:
   api-key: test-api-key-for-testing
   model:
-    embedding: text-embedding-ada-002
-    chat: gpt-3.5-turbo
+    embedding: text-embedding-3-small
+    chat: gpt-5-mini
 
 chunk:
   size: 500

@@ -32,7 +32,7 @@ public class SearchService {
         log.info("Searching for: {}", query);
 
         // 1. 질문 임베딩 생성
-        List<Double> queryEmbedding = embeddingService.createEmbedding(query);
+        List<Float> queryEmbedding = embeddingService.createEmbedding(query);
         String embeddingStr = embeddingService.embeddingToString(queryEmbedding);
 
         // 2. 유사도 검색

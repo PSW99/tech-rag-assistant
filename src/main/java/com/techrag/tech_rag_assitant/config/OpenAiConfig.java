@@ -1,11 +1,10 @@
 package com.techrag.tech_rag_assitant.config;
 
-import com.theokanning.openai.service.OpenAiService;
+import com.openai.client.OpenAIClient;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.time.Duration;
 
 @Configuration
 public class OpenAiConfig {
@@ -14,7 +13,9 @@ public class OpenAiConfig {
     private String apiKey;
 
     @Bean
-    public OpenAiService openAiService() {
-        return new OpenAiService(apiKey, Duration.ofSeconds(30));
+    public OpenAIClient openAIClient() {
+        return OpenAIOkHttpClient.builder()
+                .apiKey(apiKey)
+                .build();
     }
 }
