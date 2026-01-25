@@ -1,8 +1,8 @@
 package com.techrag.tech_rag_assitant.embedding;
 
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.embedding.EmbeddingResult;
-import com.theokanning.openai.service.OpenAiService;
+import com.openai.client.OpenAIClient;
+import com.openai.models.embeddings.CreateEmbeddingResponse;
+import com.openai.models.embeddings.EmbeddingCreateParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,29 +15,29 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmbeddingService {
 
-    private final OpenAiService openAiService;
+    private final OpenAIClient openAIClient;
 
-    @Value("${openai.model.embedding:text-embedding-ada-002}")
+    @Value("${openai.model.embedding:text-embedding-3-small}")
     private String embeddingModel;
 
-    public List<Double> createEmbedding(String text) {
-        log.debug("Creating embedding for text: {}...", 
+    public List<Float> createEmbedding(String text) {
+        log.debug("Creating embedding for text: {}...",
                 text.substring(0, Math.min(50, text.length())));
 
-        EmbeddingRequest request = EmbeddingRequest.builder()
+        EmbeddingCreateParams params = EmbeddingCreateParams.builder()
                 .model(embeddingModel)
-                .input(List.of(text))
+                .input(text)
                 .build();
 
-        EmbeddingResult result = openAiService.createEmbeddings(request);
+        CreateEmbeddingResponse response = openAIClient.embeddings().create(params);
 
-        List<Double> embedding = result.getData().get(0).getEmbedding();
+        List<Float> embedding = response.data().get(0).embedding();
         log.debug("Embedding created, dimension: {}", embedding.size());
 
         return embedding;
     }
 
-    public String embeddingToString(List<Double> embedding) {
+    public String embeddingToString(List<Float> embedding) {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < embedding.size(); i++) {
             sb.append(embedding.get(i));
