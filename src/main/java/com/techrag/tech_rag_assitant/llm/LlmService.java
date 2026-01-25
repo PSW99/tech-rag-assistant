@@ -1,17 +1,14 @@
 package com.techrag.tech_rag_assitant.llm;
 
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatCompletionResult;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
-import com.theokanning.openai.service.OpenAiService;
+import com.openai.client.OpenAIClient;
+import com.openai.models.chat.completions.ChatCompletion;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.techrag.tech_rag_assitant.search.dto.SearchResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -19,29 +16,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LlmService {
 
-    private final OpenAiService openAiService;
+    private final OpenAIClient openAIClient;
 
-    @Value("${openai.model.chat:gpt-3.5-turbo}")
+    @Value("${openai.model.chat:gpt-5-mini}")
     private String chatModel;
 
     public String generateAnswer(String question, List<SearchResult> contexts) {
         log.info("Generating answer for: {}", question);
 
         String systemPrompt = buildSystemPrompt(contexts);
-        
-        List<ChatMessage> messages = new ArrayList<>();
-        messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), systemPrompt));
-        messages.add(new ChatMessage(ChatMessageRole.USER.value(), question));
 
-        ChatCompletionRequest request = ChatCompletionRequest.builder()
+        ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
                 .model(chatModel)
-                .messages(messages)
-                .maxTokens(1000)
-                .temperature(0.7)
+                .addSystemMessage(systemPrompt)
+                .addUserMessage(question)
+                .maxCompletionTokens(1000L)
                 .build();
 
-        ChatCompletionResult result = openAiService.createChatCompletion(request);
-        String answer = result.getChoices().get(0).getMessage().getContent();
+        ChatCompletion completion = openAIClient.chat().completions().create(params);
+        String answer = completion.choices().get(0).message().content().orElse("");
 
         log.info("Answer generated, length: {}", answer.length());
         return answer;
