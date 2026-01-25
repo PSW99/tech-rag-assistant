@@ -21,8 +21,8 @@ spring:
 openai:
   api-key: ${OPENAI_API_KEY}
   model:
-    embedding: text-embedding-ada-002
-    chat: gpt-3.5-turbo
+    embedding: text-embedding-3-small
+    chat: gpt-5-mini
 
 chunk:
   size: 500
