@@ -18,6 +18,7 @@ openai:
   api-key: test-api-key-for-testing
   model:
     embedding: text-embedding-ada-002
+    chat: gpt-3.5-turbo
 
 chunk:
   size: 500
