@@ -57,7 +57,7 @@ class DocumentServiceTest {
         ReflectionTestUtils.setField(savedDocument, "id", 1L);
 
         List<String> chunks = List.of("Spring Boot는 자바 웹 프레임워크입니다.");
-        List<Double> embedding = Arrays.asList(0.1, 0.2, 0.3);
+        List<Float> embedding = Arrays.asList(0.1f, 0.2f, 0.3f);
 
         when(documentRepository.save(any(Document.class))).thenReturn(savedDocument);
         when(chunkService.splitIntoChunks(anyString())).thenReturn(chunks);
@@ -95,7 +95,7 @@ class DocumentServiceTest {
         ReflectionTestUtils.setField(savedDocument, "id", 1L);
 
         List<String> chunks = List.of("청크1", "청크2", "청크3");
-        List<Double> embedding = Arrays.asList(0.1, 0.2, 0.3);
+        List<Float> embedding = Arrays.asList(0.1f, 0.2f, 0.3f);
 
         when(documentRepository.save(any(Document.class))).thenReturn(savedDocument);
         when(chunkService.splitIntoChunks(anyString())).thenReturn(chunks);

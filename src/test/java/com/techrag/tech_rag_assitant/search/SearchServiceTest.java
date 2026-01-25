@@ -46,7 +46,7 @@ class SearchServiceTest {
         ReflectionTestUtils.setField(request, "query", "Spring Boot 설정 방법");
         ReflectionTestUtils.setField(request, "limit", 5);
 
-        List<Double> embedding = Arrays.asList(0.1, 0.2, 0.3);
+        List<Float> embedding = Arrays.asList(0.1f, 0.2f, 0.3f);
         when(embeddingService.createEmbedding(anyString())).thenReturn(embedding);
         when(embeddingService.embeddingToString(embedding)).thenReturn("[0.1,0.2,0.3]");
 
@@ -83,7 +83,7 @@ class SearchServiceTest {
         ReflectionTestUtils.setField(request, "query", "존재하지 않는 내용");
         ReflectionTestUtils.setField(request, "limit", 5);
 
-        List<Double> embedding = Arrays.asList(0.1, 0.2, 0.3);
+        List<Float> embedding = Arrays.asList(0.1f, 0.2f, 0.3f);
         when(embeddingService.createEmbedding(anyString())).thenReturn(embedding);
         when(embeddingService.embeddingToString(embedding)).thenReturn("[0.1,0.2,0.3]");
         when(chunkRepository.findSimilarChunksRaw(anyString(), anyInt()))
