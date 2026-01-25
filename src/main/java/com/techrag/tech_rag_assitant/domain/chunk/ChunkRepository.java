@@ -9,9 +9,12 @@ import java.util.List;
 public interface ChunkRepository extends JpaRepository<Chunk, Long> {
 
     @Query(value = """
-        SELECT c.* FROM chunks c
+        SELECT c.id, c.document_id, c.content, c.embedding, c.created_at,
+               c.embedding <=> cast(:embedding as vector) AS distance
+        FROM chunks c
+        WHERE c.embedding IS NOT NULL
         ORDER BY c.embedding <=> cast(:embedding as vector)
         LIMIT :limit
         """, nativeQuery = true)
-    List<Chunk> findSimilarChunks(@Param("embedding") String embedding, @Param("limit") int limit);
+    List<Object[]> findSimilarChunksRaw(@Param("embedding") String embedding, @Param("limit") int limit);
 }
