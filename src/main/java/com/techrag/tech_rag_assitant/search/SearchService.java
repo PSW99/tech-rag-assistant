@@ -25,17 +25,20 @@ public class SearchService {
     private final EmbeddingService embeddingService;
 
     public List<SearchResult> search(SearchRequest request) {
-        log.info("Searching for: {}", request.getQuery());
+        return searchByQuery(request.getQuery(), request.getLimit());
+    }
 
-        // 질문 임베딩 생성
-        List<Double> queryEmbedding = embeddingService.createEmbedding(request.getQuery());
+    public List<SearchResult> searchByQuery(String query, int limit) {
+        log.info("Searching for: {}", query);
+
+        // 1. 질문 임베딩 생성
+        List<Double> queryEmbedding = embeddingService.createEmbedding(query);
         String embeddingStr = embeddingService.embeddingToString(queryEmbedding);
 
-        // 유사도 검색
-        List<Object[]> rawResults = chunkRepository.findSimilarChunksRaw(
-                embeddingStr, request.getLimit());
+        // 2. 유사도 검색
+        List<Object[]> rawResults = chunkRepository.findSimilarChunksRaw(embeddingStr, limit);
 
-        // 3과 변환
+        // 3. 결과 변환
         List<SearchResult> results = new ArrayList<>();
         for (Object[] row : rawResults) {
             Long chunkId = ((Number) row[0]).longValue();
